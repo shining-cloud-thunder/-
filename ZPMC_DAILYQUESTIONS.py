@@ -7,6 +7,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 
 # 测试git
@@ -147,13 +148,14 @@ def main(this_time):
             return
 
     URL = 'https://kaoshi.wjx.top/vm/Q07QMNw.aspx'
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")  # 启用无头模式
     # 启动selenium开始自动化测试
-    driver = webdriver.Chrome(service=Service(r'F:\chromedriver-win64\chromedriver-win64\chromedriver.exe'))
+    driver = webdriver.Chrome(service=Service(r'F:\chromedriver-win64\chromedriver-win64\chromedriver.exe'), options=chrome_options)
+    driver.get(URL)
     # 办公室笔记本驱动地址：D:\Learning\chromedriver-win64\chromedriver.exe
     # 宿舍电脑驱动地址：F:\chromedriver-win64\chromedriver-win64\chromedriver.exe
-    options = webdriver.ChromeOptions()  # 创建一个配置对象
-    options.add_argument("--headless")  # 开启无界面模式
-    options.add_argument("--disable-gpu")  # 禁用gpu
+
     # 加载网页
     driver.get(URL)
     # 读取网页，不会导致网页被二次加载
@@ -392,6 +394,12 @@ def main(this_time):
             except pymysql.err.IntegrityError as e:
                 print(e)
     driver.quit()
+    try:
+        sql = "DELETE FROM question_right_answer WHERE right_answer is NULL"
+        cursor.execute(sql)
+        db.commit()
+    except pymysql.err.IntegrityError as e:
+        print(e)
 for this_time in range(int(answer_times)):
     main(this_time)
 
