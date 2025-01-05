@@ -24,14 +24,14 @@ try:
     cursor = db.cursor()
     # 创建数据库表（存在会pass）
     try:
-        cursor.execute('CREATE TABLE IF NOT EXIST question_right_answer (id INT PRIMARY KEY, right_answer VARCHAR(1000))')
-        cursor.execute('CREATE TABLE IF NOT EXIST questions_options (id INT PRIMARY KEY, option_A VARCHAR(1000), option_B VARCHAR(1000), option_C VARCHAR(1000), option_D VARCHAR(1000), option_E VARCHAR(1000), option_F VARCHAR(1000), option_G VARCHAR(1000))')
-        cursor.execute('CREATE TABLE IF NOT EXIST questions_title (id INT PRIMARY KEY, title VARCHAR(1000))')
-        cursor.execute('CREATE TABLE IF NOT EXIST user_scores (user_work_id VARCHAR(100) , scores VARCHAR(1000))')
-        cursor.execute('CREATE TABLE IF NOT EXIST users (user_work_id VARCHAR(100), user_name VARCHAR(100) PRIMARY KEY, user_department VARCHAR(1000))')
+        cursor.execute('CREATE TABLE IF NOT EXISTS question_right_answer (id INT PRIMARY KEY, right_answer VARCHAR(1000))')
+        cursor.execute('CREATE TABLE IF NOT EXISTS questions_options (id INT PRIMARY KEY, option_A VARCHAR(1000), option_B VARCHAR(1000), option_C VARCHAR(1000), option_D VARCHAR(1000), option_E VARCHAR(1000), option_F VARCHAR(1000), option_G VARCHAR(1000))')
+        cursor.execute('CREATE TABLE IF NOT EXISTS questions_title (id INT PRIMARY KEY, title VARCHAR(1000))')
+        cursor.execute('CREATE TABLE IF NOT EXISTS user_scores (user_work_id VARCHAR(100), scores VARCHAR(1000))')
+        cursor.execute('CREATE TABLE IF NOT EXISTS users (user_work_id VARCHAR(100), user_name VARCHAR(100) PRIMARY KEY, user_department VARCHAR(1000))')
         db.commit()
     except pymysql.err.OperationalError as e:
-        pass
+        print(e)
 
 except pymysql.Error as e:
     print("数据库连接失败" + str(e))
@@ -151,7 +151,9 @@ def main(this_time):
     driver = webdriver.Chrome(service=Service(r'F:\chromedriver-win64\chromedriver-win64\chromedriver.exe'))
     # 办公室笔记本驱动地址：D:\Learning\chromedriver-win64\chromedriver.exe
     # 宿舍电脑驱动地址：F:\chromedriver-win64\chromedriver-win64\chromedriver.exe
-
+    options = webdriver.ChromeOptions()  # 创建一个配置对象
+    options.add_argument("--headless")  # 开启无界面模式
+    options.add_argument("--disable-gpu")  # 禁用gpu
     # 加载网页
     driver.get(URL)
     # 读取网页，不会导致网页被二次加载
@@ -168,7 +170,11 @@ def main(this_time):
     # 点击选择部门选框，最多等待2秒
     WebDriverWait(driver, 2).until(EC.presence_of_element_located(("xpath","/html/body/div[4]/div[2]/div/div/div[2]/div[1]/div/span/span[1]/span/span[1]"))).click()
     # 选择答题人的部门,按下多少次
-    for i in range(102):
+    if WORK_DEPARTMENT == "机电调试二室":
+        select_department = 102
+    else:
+        select_department = 101
+    for i in range(select_department):
         ActionChains(driver).send_keys(Keys.ARROW_DOWN).perform()
     # 回车选定
     ActionChains(driver).send_keys(Keys.ENTER).perform()
@@ -249,6 +255,8 @@ def main(this_time):
         QUESTION_OPTIONS.append(options)
 
     # 将选项数据传输到数据库中 questions_options id option_A~G
+    # answer_paper 答题的痕迹
+    answer_paper = [None] * 5
     k = 0
     for questions_options_block in QUESTION_OPTIONS:
         ascii_value = 65 # A
@@ -256,6 +264,8 @@ def main(this_time):
             character = chr(ascii_value)
             try:
                 sql = "UPDATE questions_options SET option_" + character + "=%s WHERE id=%s"
+                if '对' == option:
+                    answer_paper[k] = '对'
                 value = (option, QUESTION_IDS[k])
                 cursor.execute(sql, value)
                 db.commit()
@@ -286,6 +296,8 @@ def main(this_time):
                 pass
             # 没见过的题目全部选第一个选项
             Answer_test.answer_a()
+            if '对' != answer_paper[k]:
+                answer_paper.append('A')
         else:
             recognized_number += 1
             result = cursor.execute("SELECT right_answer FROM question_right_answer WHERE id="+f"{int(QUESTION_IDS[k])}")
@@ -294,20 +306,28 @@ def main(this_time):
             for row in answer_list:
                 if "对" in row:
                     Answer_test.answer_a()
+                    answer_paper[k] = '对'
                 if "错" in row:
                     Answer_test.answer_b()
+                    answer_paper[k] = '错'
                 if "A" in row:
                     Answer_test.answer_a()
+                    answer_paper[k] = 'A'
                 if "B" in row:
                     Answer_test.answer_b()
+                    answer_paper[k] = 'B'
                 if "C" in row:
                     Answer_test.answer_c()
+                    answer_paper[k] = 'C'
                 if "D" in row:
                     Answer_test.answer_d()
+                    answer_paper[k] = 'D'
                 if "E" in row:
                     Answer_test.answer_e()
+                    answer_paper[k] = 'E'
                 if "F" in row:
                     Answer_test.answer_f()
+                    answer_paper[k] = 'F'
 
     # 答题完成后的休眠时间
     time.sleep(int(sleep_time))
@@ -341,13 +361,22 @@ def main(this_time):
         blocks = str(ANSWER_BLOCK_XPATH + "/div[" + str(i) + "]")
         ANSWER_BLOCK_LIST_XPATH.append(blocks)
         if Actions.obtain_information_by_xpath(blocks + "/div[2]/div/div[2]/span") == "回答正确":
-            try:
-                sql = "UPDATE question_right_answer SET right_answer=%s WHERE id=%s"
-                value = ("A", QUESTION_IDS[i-4])
-                cursor.execute(sql, value)
-                db.commit()
-            except pymysql.err.IntegrityError as e:
-                print(e)
+            if answer_paper[i-4] == 'A':
+                try:
+                    sql = "UPDATE question_right_answer SET right_answer=%s WHERE id=%s"
+                    value = ("A", QUESTION_IDS[i-4])
+                    cursor.execute(sql, value)
+                    db.commit()
+                except pymysql.err.IntegrityError as e:
+                    print(e)
+            elif answer_paper[i-4] == '对':
+                try:
+                    sql = "UPDATE question_right_answer SET right_answer=%s WHERE id=%s"
+                    value = ("对", QUESTION_IDS[i-4])
+                    cursor.execute(sql, value)
+                    db.commit()
+                except pymysql.err.IntegrityError as e:
+                    print(e)
         else:
             corret_answer = Actions.obtain_information_by_xpath(blocks + "/div[2]/div/div[3]/div")
             corret_answer_list = []
