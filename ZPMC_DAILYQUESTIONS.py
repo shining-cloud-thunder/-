@@ -147,7 +147,7 @@ def main(this_time):
             Actions.click_by_xpath(self.xpath + "/div[6]/span/a")
             return
 
-    URL = 'https://kaoshi.wjx.top/vm/Q07QMNw.aspx'
+    URL = 'https://kaoshi.wjx.top/vm/ryPtPiK.aspx'
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # 启用无头模式
     # 启动selenium开始自动化测试
