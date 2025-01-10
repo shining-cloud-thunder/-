@@ -9,6 +9,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
+import decode_img_url
+
+# 解析url
+qr_codes_info = decode_img_url.decode_qr_code('./decode_img_url/testUrlImg.png')
+url = qr_codes_info[0]['data']
 
 # 测试git
 # 数据库连接选项
@@ -147,14 +152,16 @@ def main(this_time):
             Actions.click_by_xpath(self.xpath + "/div[6]/span/a")
             return
 
-    URL = 'https://kaoshi.wjx.top/vm/ryPtPiK.aspx'
+    URL = url
     chrome_options = Options()
-    chrome_options.add_argument("--headless")  # 启用无头模式
+    # 启用无头模式
+    chrome_options.add_argument("--headless")
     # 启动selenium开始自动化测试
-    driver = webdriver.Chrome(service=Service(r'F:\chromedriver-win64\chromedriver-win64\chromedriver.exe'), options=chrome_options)
+    driver = webdriver.Chrome(service=Service(r'./chromedriver-win64/chromedriver.exe'), options=chrome_options)
     driver.get(URL)
     # 办公室笔记本驱动地址：D:\Learning\chromedriver-win64\chromedriver.exe
     # 宿舍电脑驱动地址：F:\chromedriver-win64\chromedriver-win64\chromedriver.exe
+    # 已经改成相对地址:./chromedriver-win64/chromedriver.exe 跟随项目的路径
 
     # 加载网页
     driver.get(URL)
