@@ -4,7 +4,7 @@ Created by python etc
 
 ### 运行前需要提前准备的事
 
-<font color="red">为避免联系我添加您的数据库服务器信息</font>
+<font color="red">已经为每个用户创建初始密码</font>
 
 1. 安装pycharm
 

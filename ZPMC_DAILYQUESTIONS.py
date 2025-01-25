@@ -47,17 +47,25 @@ except pymysql.Error as e:
 input_name = input("你的名字是?\n")
 NAME = input_name
 try:
-    cursor.execute("SELECT user_name,user_work_id FROM users")
+    cursor.execute("SELECT user_name,user_work_id,password FROM users")
     tuple = cursor.fetchall()  # 返回的是一个元组列表
     name_list = [tup[0] for tup in tuple]
     work_numberlist = [tup[1] for tup in tuple]
+    passwordlist = [tup[2] for tup in tuple]
     try:
         # where=后面一定要加双引号，否则一直报错找不到column！！！！！！！！ 标准模板！！！！！！！
-        sql = 'SELECT user_work_id, user_department FROM users WHERE user_name ="%s"' % NAME
+        sql = 'SELECT user_work_id, user_department, password FROM users WHERE user_name ="%s"' % NAME
         cursor.execute(sql)
         work_number_tuple = cursor.fetchall()
         WORK_NUMBER = work_number_tuple[0][0]
         WORK_DEPARTMENT = work_number_tuple[0][1]
+        WORK_PASSWORD = work_number_tuple[0][2]
+        while(True):
+            input_password = input("请输入密码！" + '\n')
+            if(input_password != WORK_PASSWORD):
+                if (input_password == "q"):
+                    sys.exit()
+                print("密码错误，请重新输入密码或输入q退出程序")
         print("欢迎回来：" + NAME + "\n工号：" +WORK_NUMBER+ "\n部门："+WORK_DEPARTMENT)
 
         # 答题次数控制
