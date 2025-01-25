@@ -190,14 +190,14 @@ def main(this_time):
     Actions.click_by_xpath("/html/body/div[4]/div[2]/div/div/div[5]/a")
 
     # 传输刷题人信息到数据库
-    try:
-        sql = "INSERT INTO users(user_work_id, user_name, user_department) VALUE (%s, %s, %s)"
-        value = (WORK_NUMBER, NAME, WORK_DEPARTMENT)
-        cursor.execute(sql, value)
-        db.commit()
-        print(f"{NAME}的信息已经被传输到数据库！")
-    except pymysql.err.IntegrityError as e:
-        pass
+    # try:
+    #     sql = "INSERT INTO users(user_work_id, user_name, user_department) VALUE (%s, %s, %s)"
+    #     value = (WORK_NUMBER, NAME, WORK_DEPARTMENT)
+    #     cursor.execute(sql, value)
+    #     db.commit()
+    #     print(f"{NAME}的信息已经被传输到数据库！")
+    # except pymysql.err.IntegrityError as e:
+    #     pass
     # 到此基本信息填写完成---------------------------------------------------------------------------------------------------
 
     # 查询父标签下有多少子标签,recursive=False表示只查询当前父标签下的子标签，不对子标签在进行搜索
@@ -349,10 +349,10 @@ def main(this_time):
 
     # 获取答题分数
     score = Actions.obtain_information_by_xpath("/html/body/div[2]/div[2]/div[1]/div[2]/div/div[1]/div[2]/div[1]/div")
-    print(f"第{this_time + 1}次拿到了{score}分，识别到{recognized_number}题答案")
-    if int(recognized_number)*20 > int(score):
-        print(QUESTION_IDS)
-        input('题库识别与分数对应不了，答案出现问题')
+    # print(f"第{this_time + 1}次拿到了{score}分，识别到{recognized_number}题答案")
+    # if int(recognized_number)*20 > int(score):
+    #     print(QUESTION_IDS)
+    #     input('题库识别与分数对应不了，答案出现问题')
 
     # 将分数放在数据库中
     try:
