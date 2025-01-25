@@ -1,3 +1,4 @@
+import sys
 import time
 import pymysql
 from time import sleep
@@ -45,10 +46,11 @@ except pymysql.Error as e:
 # 详细信息输入
 input_name = input("你的名字是?\n")
 NAME = input_name
-cursor.execute("SELECT user_name FROM users")
-name_tuple = cursor.fetchall() # 返回的是一个元组列表
-name_list = [tup[0] for tup in name_tuple]
-if NAME in name_list:
+try:
+    cursor.execute("SELECT user_name,user_work_id FROM users")
+    tuple = cursor.fetchall()  # 返回的是一个元组列表
+    name_list = [tup[0] for tup in tuple]
+    work_numberlist = [tup[1] for tup in tuple]
     try:
         # where=后面一定要加双引号，否则一直报错找不到column！！！！！！！！ 标准模板！！！！！！！
         sql = 'SELECT user_work_id, user_department FROM users WHERE user_name ="%s"' % NAME
@@ -57,20 +59,24 @@ if NAME in name_list:
         WORK_NUMBER = work_number_tuple[0][0]
         WORK_DEPARTMENT = work_number_tuple[0][1]
         print("欢迎回来：" + NAME + "\n工号：" +WORK_NUMBER+ "\n部门："+WORK_DEPARTMENT)
-    except pymysql.err.OperationalError as e:
-        print(e)
-else:
-    print("数据库没发现你的信息，你是新来的！")
-    WORK_NUMBER = input("现在输入你的工号！\n")
-    WORK_DEPARTMENT = input("再输入你的部门！\n")
-    cursor.execute("INSERT INTO users VALUES (%s, %s, %s)", (WORK_NUMBER, NAME, WORK_DEPARTMENT))
-    db.commit()
 
-# 答题次数控制
-answer_times = input("刷几次？\n")
+        # 答题次数控制
+        answer_times = input("刷几次？\n")
 
-# 答题休眠时间控制
-sleep_time = input("答题完等几秒交卷？\n")
+        # 答题休眠时间控制
+        sleep_time = input("答题完等几秒交卷？\n")
+
+    except IndexError as e:
+        print("您不在受信任名单中，现无法通过用户从服务器添加受信任名单!")
+        result_check = input("查看受信任名单的工号？y/n" + "\n")
+        if result_check == 'y':
+            print(work_numberlist)
+            sys.exit()
+        else:
+            sys.exit()
+except pymysql.err.OperationalError as e:
+    print(e)
+
 
 # 操作主函数
 def main(this_time):
@@ -349,7 +355,7 @@ def main(this_time):
 
     # 获取答题分数
     score = Actions.obtain_information_by_xpath("/html/body/div[2]/div[2]/div[1]/div[2]/div/div[1]/div[2]/div[1]/div")
-    # print(f"第{this_time + 1}次拿到了{score}分，识别到{recognized_number}题答案")
+    print(f"第{this_time + 1}次拿到了{score}分")
     # if int(recognized_number)*20 > int(score):
     #     print(QUESTION_IDS)
     #     input('题库识别与分数对应不了，答案出现问题')
