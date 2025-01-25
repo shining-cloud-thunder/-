@@ -4,6 +4,8 @@ Created by python etc
 
 ### 运行前需要提前准备的事
 
+<font color="red">为避免联系我添加您的数据库服务器信息</font>
+
 1. 安装pycharm
 
 - pycharm windows版本下载地址：https://www.jetbrains.com/pycharm/download/#section=windows
