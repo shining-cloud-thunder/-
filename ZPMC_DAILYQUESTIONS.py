@@ -17,10 +17,10 @@ url = qr_codes_info[0]['data']
 
 # 测试git
 # 数据库连接选项
-DBHOST = 'localhost'
-DBUSER = 'root'
-DBPASS = '123456'
-DBNAME = 'zpmc_dailyquestions'
+DBHOST = '81.68.222.54'
+DBUSER = 'ZPMC_Users'
+DBPASS = 'Zpmc1234#'
+DBNAME = 'Zpmc_Dailyquestions'
 
 # 以下内容一般不可以修改-------------------------------------------------------------------------------------------------------------
 # 数据库连接模块
@@ -29,15 +29,15 @@ try:
     # 设置数据库游标
     cursor = db.cursor()
     # 创建数据库表（存在会pass）
-    try:
-        cursor.execute('CREATE TABLE IF NOT EXISTS question_right_answer (id INT PRIMARY KEY, right_answer VARCHAR(1000))')
-        cursor.execute('CREATE TABLE IF NOT EXISTS questions_options (id INT PRIMARY KEY, option_A VARCHAR(1000), option_B VARCHAR(1000), option_C VARCHAR(1000), option_D VARCHAR(1000), option_E VARCHAR(1000), option_F VARCHAR(1000), option_G VARCHAR(1000))')
-        cursor.execute('CREATE TABLE IF NOT EXISTS questions_title (id INT PRIMARY KEY, title VARCHAR(1000))')
-        cursor.execute('CREATE TABLE IF NOT EXISTS user_scores (user_work_id VARCHAR(100), scores VARCHAR(1000))')
-        cursor.execute('CREATE TABLE IF NOT EXISTS users (user_work_id VARCHAR(100), user_name VARCHAR(100) PRIMARY KEY, user_department VARCHAR(1000))')
-        db.commit()
-    except pymysql.err.OperationalError as e:
-        print(e)
+    # try:
+    #     cursor.execute('CREATE TABLE IF NOT EXISTS question_right_answer (id INT PRIMARY KEY, right_answer VARCHAR(1000))')
+    #     cursor.execute('CREATE TABLE IF NOT EXISTS questions_options (id INT PRIMARY KEY, option_A VARCHAR(1000), option_B VARCHAR(1000), option_C VARCHAR(1000), option_D VARCHAR(1000), option_E VARCHAR(1000), option_F VARCHAR(1000), option_G VARCHAR(1000))')
+    #     cursor.execute('CREATE TABLE IF NOT EXISTS questions_title (id INT PRIMARY KEY, title VARCHAR(1000))')
+    #     cursor.execute('CREATE TABLE IF NOT EXISTS user_scores (user_work_id VARCHAR(100), scores VARCHAR(1000))')
+    #     cursor.execute('CREATE TABLE IF NOT EXISTS users (user_work_id VARCHAR(100), user_name VARCHAR(100) PRIMARY KEY, user_department VARCHAR(1000))')
+    #     db.commit()
+    # except pymysql.err.OperationalError as e:
+    #     print(e)
 
 except pymysql.Error as e:
     print("数据库连接失败" + str(e))
